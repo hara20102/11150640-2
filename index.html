@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>11150640-final</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div id="background-image-container"></div>
+    <div id="backdrop-filter"></div>
+
+    <div class="title">
+        <h1>WELCOME</h1>
+        <div class="buttom-enter"><a href="#">
+            <h3>ENTER</a></h3></a>
+        </div>
+    </div>
+
+    <script>
+        // 等待 DOM 內容完全載入後再執行腳本
+        document.addEventListener('DOMContentLoaded', () => {
+            // 取得模糊覆蓋層元素
+            const blurredOverlay = document.getElementById('backdrop-filter');
+
+            // 處理移動事件的通用函數 (同時適用於滑鼠和觸控)
+            function handleMovement(clientX, clientY) {
+                // 直接設定 CSS 變數來控制徑向漸變的中心點
+                // 游標會位於光圈正中央，因為 'at' 關鍵字會將漸變中心定位到該點
+                blurredOverlay.style.setProperty('--maskX', `${clientX}px`);
+                blurredOverlay.style.setProperty('--maskY', `${clientY}px`);
+            }
+
+            // 監聽整個文檔的滑鼠移動事件
+            document.addEventListener('mousemove', (e) => {
+                handleMovement(e.clientX, e.clientY);
+            });
+
+            // 監聽整個文檔的觸控移動事件 (for mobile)
+            document.addEventListener('touchmove', (e) => {
+                // 防止滾動或縮放等預設觸控行為
+                e.preventDefault(); 
+                // 取得第一個觸控點的座標
+                if (e.touches.length > 0) {
+                    handleMovement(e.touches[0].clientX, e.touches[0].clientY);
+                }
+            }, { passive: false }); // { passive: false } 允許 preventDefault() 生效
+        });
+    </script>
+</body>
+</html>
