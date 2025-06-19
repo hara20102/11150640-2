@@ -24,31 +24,116 @@
     <script>
         // 等待 DOM 內容完全載入後再執行腳本
         document.addEventListener('DOMContentLoaded', () => {
-            // 取得模糊覆蓋層元素
+            const buttomEnter = document.querySelector('.buttom-enter');
             const blurredOverlay = document.getElementById('backdrop-filter');
+            const enterLink = buttomEnter.querySelector('a'); // 獲取按鈕內的 <a> 標籤
 
-            // 處理移動事件的通用函數 (同時適用於滑鼠和觸控)
-            function handleMovement(clientX, clientY) {
-                // 直接設定 CSS 變數來控制徑向漸變的中心點
-                // 游標會位於光圈正中央，因為 'at' 關鍵字會將漸變中心定位到該點
-                blurredOverlay.style.setProperty('--maskX', `${clientX}px`);
-                blurredOverlay.style.setProperty('--maskY', `${clientY}px`);
+            // 儲存初始 CSS 值，用於重置
+            let initialBlurStrength;
+            let initialClearMaskRadiusForFollow; // 用於鼠標追蹤的清晰半徑
+            let initialBlurMaskRadiusForFollow;  // 用於鼠標追蹤的模糊半徑
+            let isButtonHovered = false; // 新增：追蹤按鈕是否被懸停
+
+            // 函數用於獲取計算後的樣式並設定初始值
+            function setInitialStyles() {
+                const computedStyle = getComputedStyle(blurredOverlay);
+                // 獲取在當前媒體查詢下定義的初始值
+                initialBlurStrength = computedStyle.getPropertyValue('--initial-blur-strength').trim(); 
+                initialClearMaskRadiusForFollow = computedStyle.getPropertyValue('--initial-clear-mask-radius').trim(); // 鼠標追蹤的初始半徑
+                initialBlurMaskRadiusForFollow = computedStyle.getPropertyValue('--initial-blur-mask-radius').trim(); // 鼠標追蹤的模糊半徑
+
+                // 應用初始值到當前使用的 CSS 變數，確保畫面完全模糊
+                blurredOverlay.style.setProperty('--current-clear-radius', '0px'); // 初始時無清晰點
+                blurredOverlay.style.setProperty('--current-blur-radius', '1px');  // 初始時遮罩為完全不透明
+                blurredOverlay.style.setProperty('--current-blur-strength', initialBlurStrength); 
             }
 
-            // 監聽整個文檔的滑鼠移動事件
+            // 在 DOM 載入完成和視窗大小改變時設定初始樣式
+            setInitialStyles();
+            window.addEventListener('resize', setInitialStyles);
+
+            // 滑鼠進入按鈕事件
+            buttomEnter.addEventListener('mouseenter', (e) => {
+                isButtonHovered = true; // 設置懸停旗標為 true
+
+                // 獲取滑鼠在視窗中的位置
+                const mouseX = e.clientX;
+                const mouseY = e.clientY;
+
+                // 設定遮罩的原點為滑鼠位置
+                blurredOverlay.style.setProperty('--maskX', `${mouseX}px`);
+                blurredOverlay.style.setProperty('--maskY', `${mouseY}px`);
+
+                // 計算一個足夠大的半徑來覆蓋整個螢幕，確保清晰效果從游標處擴散至全屏
+                const maxRadius = Math.max(window.innerWidth, window.innerHeight) * 1.5; 
+
+                // 動畫至清晰狀態：將清晰和模糊半徑設定為大值，並將模糊強度設為 0
+                blurredOverlay.style.setProperty('--current-clear-radius', `${maxRadius}px`);
+                blurredOverlay.style.setProperty('--current-blur-radius', `${maxRadius + 50}px`); // 保持 50px 的羽化過渡
+                blurredOverlay.style.setProperty('--current-blur-strength', '0px'); 
+            });
+
+            // 滑鼠離開按鈕事件
+            buttomEnter.addEventListener('mouseleave', () => {
+                isButtonHovered = false; // 設置懸停旗標為 false
+
+                // 重置為初始的模糊強度和鼠標追蹤的遮罩半徑
+                blurredOverlay.style.setProperty('--current-clear-radius', initialClearMaskRadiusForFollow);
+                blurredOverlay.style.setProperty('--current-blur-radius', initialBlurMaskRadiusForFollow);
+                blurredOverlay.style.setProperty('--current-blur-strength', initialBlurStrength); 
+            });
+
+            // 處理頁面鼠標移動事件（讓圓形清晰區域跟隨鼠標/觸控點）
             document.addEventListener('mousemove', (e) => {
-                handleMovement(e.clientX, e.clientY);
+                // 只有當按鈕未被 hover 時，才讓清晰點跟隨鼠標
+                if (!isButtonHovered) {
+                    // 將鼠標位置設定給遮罩原點
+                    blurredOverlay.style.setProperty('--maskX', `${e.clientX}px`);
+                    blurredOverlay.style.setProperty('--maskY', `${e.clientY}px`);
+                    // 恢復鼠標追蹤的清晰/模糊半徑
+                    blurredOverlay.style.setProperty('--current-clear-radius', initialClearMaskRadiusForFollow);
+                    blurredOverlay.style.setProperty('--current-blur-radius', initialBlurMaskRadiusForFollow);
+                    blurredOverlay.style.setProperty('--current-blur-strength', initialBlurStrength);
+                } else {
+                    // 當按鈕被 hover 時，依然更新 --maskX 和 --maskY，保證擴散點位置準確
+                    blurredOverlay.style.setProperty('--maskX', `${e.clientX}px`);
+                    blurredOverlay.style.setProperty('--maskY', `${e.clientY}px`);
+                }
             });
 
             // 監聽整個文檔的觸控移動事件 (for mobile)
             document.addEventListener('touchmove', (e) => {
-                // 防止滾動或縮放等預設觸控行為
                 e.preventDefault(); 
-                // 取得第一個觸控點的座標
                 if (e.touches.length > 0) {
-                    handleMovement(e.touches[0].clientX, e.touches[0].clientY);
+                    // 觸控移動時，同樣要檢查按鈕是否被觸控（簡化處理，直接跟隨觸控點）
+                    // 這裡的邏輯需要更精細來判斷是否觸控到按鈕來觸發全屏清晰，但目前會讓圓點追蹤
+                    blurredOverlay.style.setProperty('--maskX', `${e.touches[0].clientX}px`);
+                    blurredOverlay.style.setProperty('--maskY', `${e.touches[0].clientY}px`);
+                    
+                    // 在觸控設備上，通常沒有 hover 狀態。
+                    // 如果需要觸控按鈕觸發全屏清晰，需要額外的 touchstart/touchend 邏輯
+                    // 目前觸控僅實現圓點跟隨，如果需要全螢幕清晰，則需要類似 click/touchstart 的觸發。
+                    if (!isButtonHovered) { // 這裡的 isButtonHovered 對於觸控設備可能不完全準確，但作為參考
+                        blurredOverlay.style.setProperty('--current-clear-radius', initialClearMaskRadiusForFollow);
+                        blurredOverlay.style.setProperty('--current-blur-radius', initialBlurMaskRadiusForFollow);
+                        blurredOverlay.style.setProperty('--current-blur-strength', initialBlurStrength);
+                    }
                 }
-            }, { passive: false }); // { passive: false } 允許 preventDefault() 生效
+            }, { passive: false }); 
+
+            // 點擊 ENTER 按鈕的事件
+            enterLink.addEventListener('click', (e) => {
+                e.preventDefault(); 
+
+                buttomEnter.classList.add('is-enlarging');
+
+                const destinationUrl = enterLink.href;
+
+                const animationDuration = 500; 
+                setTimeout(() => {
+                    window.location.href = destinationUrl; 
+                }, animationDuration);
+            });
         });
     </script>
 </body>

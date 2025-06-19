@@ -16,6 +16,45 @@ body {
     width: 100vw;
 }
 
+
+#background-image-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    z-index: 1;
+}
+
+#backdrop-filter {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    --current-blur-strength: var(--initial-blur-strength);
+    --current-clear-radius: 0px; 
+    --current-blur-radius: 1px;
+
+    backdrop-filter: blur(var(--current-blur-strength));
+    -webkit-backdrop-filter: blur(var(--current-blur-strength));
+    -webkit-mask-image: radial-gradient(circle at var(--maskX, 50%) var(--maskY, 50%), transparent var(--current-clear-radius), black var(--current-blur-radius));
+    mask-image: radial-gradient(circle at var(--maskX, 50%) var(--maskY, 50%), transparent var(--current-clear-radius), black var(--current-blur-radius));
+
+    -webkit-mask-size: 100% 100%; 
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    z-index: 999;
+    pointer-events: none;
+    transition: backdrop-filter 3.0s ease-out, 
+                -webkit-backdrop-filter 3.0s ease-out, 
+                --current-clear-radius 3.0s ease-out, 
+                --current-blur-radius 3.0s ease-out;
+        }
+
 .title{
     display: flex;
     flex-direction: column;
@@ -49,12 +88,20 @@ h3:hover {
 }
 .buttom-enter{
     background-color: #fff;
-    transition: transform 0.2s ease-in-out;
+    transition: transform 0.5s ease-in-out;
+    cursor: pointer;
+    pointer-events: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .buttom-enter:hover {
     transform: skewX(-5deg);
 }
-
+.buttom-enter.is-enlarging {
+    transform: scale(1.5);
+}
 
 
 /*mobile*/
@@ -72,23 +119,9 @@ h3:hover {
         z-index: 1;
     }
     #backdrop-filter {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-
-        -webkit-mask-image: radial-gradient(circle at var(--maskX, 50%) var(--maskY, 50%), transparent 100px, black 160px);
-        mask-image: radial-gradient(circle at var(--maskX, 50%) var(--maskY, 50%), transparent 100px, black 160px);
-
-        -webkit-mask-size: 100% 100%; 
-        mask-size: 100% 100%;
-        -webkit-mask-repeat: no-repeat;
-        mask-repeat: no-repeat;
-        z-index: 999;
-        pointer-events: none; 
+        --initial-blur-strength: 10px;
+        --initial-clear-mask-radius: 100px;
+        --initial-blur-mask-radius: 160px;
     }
     .title{
         gap: 16px;
@@ -122,23 +155,9 @@ h3:hover {
         z-index: 1;
     }
     #backdrop-filter {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-
-        -webkit-mask-image: radial-gradient(circle at var(--maskX, 50%) var(--maskY, 50%), transparent 110px, black 180px);
-        mask-image: radial-gradient(circle at var(--maskX, 50%) var(--maskY, 50%), transparent 110px, black 180px);
-
-        -webkit-mask-size: 100% 100%; 
-        mask-size: 100% 100%;
-        -webkit-mask-repeat: no-repeat;
-        mask-repeat: no-repeat;
-        z-index: 999;
-        pointer-events: none; 
+        --initial-blur-strength: 15px;
+        --initial-clear-mask-radius: 110px;
+        --initial-blur-mask-radius: 180px;
     }
     .title{
         gap: 20px;
@@ -172,23 +191,9 @@ h3:hover {
         z-index: 1;
     }
     #backdrop-filter {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-
-        -webkit-mask-image: radial-gradient(circle at var(--maskX, 50%) var(--maskY, 50%), transparent 120px, black 200px);
-        mask-image: radial-gradient(circle at var(--maskX, 50%) var(--maskY, 50%), transparent 120px, black 200px);
-
-        -webkit-mask-size: 100% 100%; 
-        mask-size: 100% 100%;
-        -webkit-mask-repeat: no-repeat;
-        mask-repeat: no-repeat;
-        z-index: 999;
-        pointer-events: none; 
+        --initial-blur-strength: 15px;
+        --initial-clear-mask-radius: 120px;
+        --initial-blur-mask-radius: 200px;
     }
     .title{
         gap: 32px;
