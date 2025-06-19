@@ -100,7 +100,7 @@ h3:hover {
     transform: skewX(-5deg);
 }
 .buttom-enter.is-enlarging {
-    transform: scale(1.5);
+    transform: scale(1.3);
 }
 
 
