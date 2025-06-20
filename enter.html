@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>11150640-2-2</title>
+    <style>
+        @font-face {
+            font-family: 'Eras Bold ITC';
+            src: url(./fonts/ERASBD.TTF) format('truetype');
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-image: url(./images/BG02.png);
+            overflow: hidden;
+        }
+        .image-container {
+            perspective: 1000px;
+            display: flex;
+            padding: 0 10%;
+        }
+        .interactiveImage {
+            width: 30%;
+            height: 30%;
+            display: block;
+            cursor: pointer;
+            transition: transform 0.5s ease-in-out;
+            margin: 0 auto;
+            object-fit: cover;
+        }
+        .interactiveImage:hover {
+            transform: rotateY(360deg);
+        }
+        p{
+            font-family: "Eras Bold ITC";
+        }
+
+@media screen and (max-width: 767px) {
+            .image-container {
+            perspective: 1000px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            padding: 0 10%;
+        }
+
+            p{
+        font-size: 1.8rem;
+        }
+
+}
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+            .image-container {
+            perspective: 1000px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding: 0 10%;
+        }
+
+            p{
+        font-size: 2rem;
+        }
+
+}
+@media screen and (min-width: 1024px) {
+            .image-container {
+            perspective: 1000px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 10%;
+        }
+
+        p{
+        font-size: 2.4rem;
+        }
+    }
+    </style>
+</head>
+<body>
+    <div class="image-container">
+        <p>HAVE A</p>
+        <img class="interactiveImage" src="./images/brain01.png">
+        <p>BRAIN</p>
+    </div>
+</body>
+</html>
